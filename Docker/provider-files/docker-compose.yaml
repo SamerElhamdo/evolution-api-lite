@@ -7,8 +7,8 @@ services:
       dockerfile: Dockerfile
     container_name: provider-files
     restart: always
-    ports:
-      - "${PROVIDER_PORT:-5656}:5656"
+    expose:
+      - "5656"
     environment:
       - PROVIDER_PORT=${PROVIDER_PORT:-5656}
       - PROVIDER_PREFIX=${PROVIDER_PREFIX:-evolution}
