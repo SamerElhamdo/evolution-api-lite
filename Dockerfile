@@ -31,7 +31,7 @@ RUN npm run build
 FROM node:20-alpine AS final
 
 RUN apk update && \
-    apk add tzdata bash openssl
+    apk add tzdata bash openssl curl
 
 ENV TZ=America/Sao_Paulo
 

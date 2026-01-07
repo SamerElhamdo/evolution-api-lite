@@ -50,6 +50,7 @@
   "homepage": "https://github.com/EvolutionAPI/evolution-api#readme",
   "dependencies": {
     "@adiwajshing/keyed-db": "^0.2.4",
+    "@aws-sdk/client-s3": "^3.723.0",
     "@aws-sdk/client-sqs": "^3.723.0",
     "@hapi/boom": "^10.0.1",
     "@paralleldrive/cuid2": "^2.2.2",

@@ -7,6 +7,7 @@ import { CacheConf, Chatwoot, ConfigService, Database, DelInstance, ProviderSess
 import { Logger } from '@config/logger.config';
 import { INSTANCE_DIR, STORE_DIR } from '@config/path.config';
 import { NotFoundException } from '@exceptions';
+import { deleteR2Session } from '@utils/use-multi-file-auth-state-r2';
 import { execSync } from 'child_process';
 import EventEmitter2 from 'eventemitter2';
 import { rmSync } from 'fs';
@@ -162,6 +163,16 @@ export class WAMonitoringService {
 
     if (this.providerSession?.ENABLED) {
       await this.providerFiles.removeSession(instanceName);
+    }
+
+    // Delete from R2 if enabled
+    const r2Enabled = process.env?.R2_SESSION_STORAGE_ENABLED === 'true';
+    if (r2Enabled) {
+      try {
+        await deleteR2Session(instanceName);
+      } catch (error) {
+        this.logger.error(['Failed to delete session from R2', instanceName, error?.message]);
+      }
     }
   }
 

@@ -81,6 +81,7 @@ import { status } from '@utils/renderStatus';
 import useMultiFileAuthStatePrisma from '@utils/use-multi-file-auth-state-prisma';
 import { AuthStateProvider } from '@utils/use-multi-file-auth-state-provider-files';
 import { useMultiFileAuthStateRedisDb } from '@utils/use-multi-file-auth-state-redis-db';
+import { useMultiFileAuthStateR2 } from '@utils/use-multi-file-auth-state-r2';
 import axios from 'axios';
 import makeWASocket, {
   AnyMessageContent,
@@ -427,18 +428,28 @@ export class BaileysStartupService extends ChannelStartupService {
   private async defineAuthState() {
     const db = this.configService.get<Database>('DATABASE');
     const cache = this.configService.get<CacheConf>('CACHE');
-
     const provider = this.configService.get<ProviderSession>('PROVIDER');
+    const r2Enabled = process.env?.R2_SESSION_STORAGE_ENABLED === 'true';
+    const s3Config = this.configService.get<S3>('S3');
 
+    // Priority 1: R2 Storage (if enabled)
+    if (r2Enabled && s3Config?.ENABLE) {
+      this.logger.info('R2 session storage enabled');
+      return await useMultiFileAuthStateR2(this.instance.id);
+    }
+
+    // Priority 2: Provider Files
     if (provider?.ENABLED) {
       return await this.authStateProvider.authStateProvider(this.instance.id);
     }
 
+    // Priority 3: Redis
     if (cache?.REDIS.ENABLED && cache?.REDIS.SAVE_INSTANCES) {
       this.logger.info('Redis enabled');
       return await useMultiFileAuthStateRedisDb(this.instance.id, this.cache);
     }
 
+    // Priority 4: Database
     if (db.SAVE_DATA.INSTANCE) {
       return await useMultiFileAuthStatePrisma(this.instance.id, this.cache);
     }
