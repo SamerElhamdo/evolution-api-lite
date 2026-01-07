@@ -1,0 +1,36 @@
+version: '3.3'
+
+services:
+  provider-files:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: provider-files
+    restart: always
+    ports:
+      - "${PROVIDER_PORT:-5656}:5656"
+    environment:
+      - PROVIDER_PORT=${PROVIDER_PORT:-5656}
+      - PROVIDER_PREFIX=${PROVIDER_PREFIX:-evolution}
+      - PROVIDER_STORAGE_DIR=/app/storage
+      - AUTHENTICATION_API_KEY=${AUTHENTICATION_API_KEY:-BQYHJGJHJ}
+    volumes:
+      - provider_storage:/app/storage
+    networks:
+      - evolution-net
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:5656/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  provider_storage:
+    name: provider_storage
+
+networks:
+  evolution-net:
+    name: evolution-net
+    external: true
+
