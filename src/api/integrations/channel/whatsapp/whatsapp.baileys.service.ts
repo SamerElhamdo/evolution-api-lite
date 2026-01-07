@@ -1593,8 +1593,15 @@ export class BaileysStartupService extends ChannelStartupService {
     const jid = createJid(number);
 
     try {
-      const call = await this.client.offerCall(jid, isVideo);
-      setTimeout(() => this.client.terminateCall(call.id, call.to), callDuration * 1000);
+      // Type assertion for methods that may not be in WASocket type but exist at runtime
+      const client = this.client as any;
+      
+      if (typeof client.offerCall !== 'function' || typeof client.terminateCall !== 'function') {
+        throw new BadRequestException('Call methods are not available in this Baileys version');
+      }
+
+      const call = await client.offerCall(jid, isVideo);
+      setTimeout(() => client.terminateCall(call.id, call.to), callDuration * 1000);
 
       return call;
     } catch (error) {
