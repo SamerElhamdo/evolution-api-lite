@@ -22,8 +22,10 @@ services:
       retries: 3
       start_period: 40s
     
-    ports:
-      - "${SERVER_PORT:-8080}:8080"
+    # Port mapping - remove or comment out if using Traefik reverse proxy
+    # Uncomment below if you need direct port access
+    # ports:
+    #   - "${SERVER_PORT:-8080}:8080"
     
     volumes:
       - evolution_instances:/evolution/instances
@@ -131,12 +133,33 @@ services:
       redis:
         condition: service_healthy
     
-    # Labels for Dokploy
+    # Labels for Dokploy and Traefik
     labels:
       - "com.dokploy.app.name=evolution-api"
       - "com.dokploy.app.type=api"
       - "com.dokploy.app.version=2.2.1"
-      - "traefik.enable=false"
+      
+      # Traefik Labels - Configure for reverse proxy
+      # Enable Traefik
+      - "traefik.enable=true"
+      
+      # HTTP Router (optional, for HTTP access)
+      # Replace ${DOMAIN} with your actual domain in Dokploy UI
+      - "traefik.http.routers.evolution-api.rule=Host(`evolution-api.localhost`)"
+      - "traefik.http.routers.evolution-api.entrypoints=web"
+      - "traefik.http.routers.evolution-api.service=evolution-api"
+      
+      # HTTPS Router (recommended - change domain in Dokploy UI)
+      # Dokploy will replace ${DOMAIN} with your configured domain
+      - "traefik.http.routers.evolution-api-secure.rule=Host(`evolution-api.localhost`)"
+      - "traefik.http.routers.evolution-api-secure.entrypoints=websecure"
+      - "traefik.http.routers.evolution-api-secure.service=evolution-api"
+      - "traefik.http.routers.evolution-api-secure.tls=true"
+      - "traefik.http.routers.evolution-api-secure.tls.certresolver=letsencrypt"
+      
+      # Service Configuration
+      - "traefik.http.services.evolution-api.loadbalancer.server.port=8080"
+      - "traefik.http.services.evolution-api.loadbalancer.passHostHeader=true"
     
     # Resource limits (adjust based on your needs)
     deploy:
@@ -261,4 +284,7 @@ networks:
   evolution-net:
     driver: bridge
     name: evolution-net
+  # Uncomment below to use Traefik's network (if Traefik is on a different network)
+  # traefik-public:
+  #   external: true
 
