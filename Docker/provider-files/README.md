@@ -26,7 +26,17 @@ PROVIDER_PREFIX=evolution
 AUTHENTICATION_API_KEY=BQYHJGJHJ  # يجب أن يطابق Evolution API
 ```
 
-### 2. تشغيل السيرفر
+### 2. إنشاء الـ Network (إذا لم يكن موجوداً)
+
+إذا كان الـ network `evolution-net` غير موجود، أنشئه:
+
+```bash
+docker network create evolution-net
+```
+
+أو إذا كنت تستخدم docker-compose الرئيسي، سيتم إنشاؤه تلقائياً.
+
+### 3. تشغيل السيرفر
 
 #### باستخدام Docker Compose (مُوصى به)
 
@@ -35,6 +45,8 @@ cd Docker/provider-files
 docker-compose up -d
 ```
 
+> **ملاحظة:** إذا كان الـ network `evolution-net` موجوداً مسبقاً (من docker-compose الرئيسي)، سيتم استخدامه. وإذا لم يكن موجوداً، سيتم إنشاؤه تلقائياً.
+
 #### بدون Docker
 
 ```bash
@@ -42,7 +54,7 @@ npm install
 npm start
 ```
 
-### 3. التحقق من التشغيل
+### 4. التحقق من التشغيل
 
 ```bash
 # Health check
@@ -51,6 +63,8 @@ curl http://localhost:5656/ping
 ```
 
 ## ⚙️ الإعداد في Evolution API
+
+### 5. إعداد Evolution API
 
 في ملف `.env` الخاص بـ Evolution API، أضف:
 
