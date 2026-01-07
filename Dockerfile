@@ -1,7 +1,7 @@
 FROM node:20-alpine AS builder
 
 RUN apk update && \
-    apk add git wget curl bash openssl
+    apk add git wget curl bash openssl dos2unix
 
 LABEL version="2.2.1" description="Api to control whatsapp features through http requests." 
 LABEL maintainer="Davidson Gomes" git="https://github.com/DavidsonGomes"
@@ -11,7 +11,8 @@ WORKDIR /evolution
 
 COPY ./package.json ./tsconfig.json ./
 
-RUN npm install
+# Use --legacy-peer-deps to resolve jimp version conflict between package.json and baileys
+RUN npm install --legacy-peer-deps
 
 COPY ./src ./src
 COPY ./public ./public
