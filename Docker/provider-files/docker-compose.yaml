@@ -14,9 +14,7 @@ services:
       - AUTHENTICATION_API_KEY=${AUTHENTICATION_API_KEY:-BQYHJGJHJ}
     volumes:
       - provider_storage:/app/storage
-    networks:
-      - evolution-net
-      - dokploy-network  # <--- 1. أضف هذا السطر لربط الحاوية بشبكة دوكبلوي
+
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/ping"]
       interval: 30s
@@ -28,12 +26,3 @@ volumes:
   provider_storage:
     name: provider_storage
 
-networks:
-  evolution-net:
-    name: evolution-net
-    driver: bridge
-  
-  # <--- 2. عرّف شبكة دوكبلوي كشبكة خارجية
-  dokploy-network:
-    external: true
-    name: dokploy-network
