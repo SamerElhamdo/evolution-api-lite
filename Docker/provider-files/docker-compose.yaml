@@ -24,7 +24,7 @@ services:
       start_period: 10s
 
 volumes:
-  provider_storage:
+  provider_storage_volume:
     name: provider_storage_volume
 
 networks:
