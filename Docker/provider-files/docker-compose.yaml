@@ -15,7 +15,7 @@ services:
     volumes:
       - provider_storage:/app/storage
     networks:
-      - network_public
+      - provider_files_network
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/ping"]
       interval: 30s
@@ -28,7 +28,7 @@ volumes:
     name: provider_storage
 
 networks:
-  network_public:
-    driver: external
-    external: true
+  provider_files_network:
+    driver: bridge
+
 
