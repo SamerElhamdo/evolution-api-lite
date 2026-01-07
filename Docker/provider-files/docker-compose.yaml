@@ -7,10 +7,10 @@ services:
       dockerfile: Dockerfile
     container_name: provider-files
     restart: always
-    expose:
-      - "5656"
+    ports:
+      - "${PROVIDER_PORT:-3000}:3000"
     environment:
-      - PROVIDER_PORT=${PROVIDER_PORT:-5656}
+      - PROVIDER_PORT=${PROVIDER_PORT:-3000}
       - PROVIDER_PREFIX=${PROVIDER_PREFIX:-evolution}
       - PROVIDER_STORAGE_DIR=/app/storage
       - AUTHENTICATION_API_KEY=${AUTHENTICATION_API_KEY:-BQYHJGJHJ}
@@ -19,7 +19,7 @@ services:
     networks:
       - evolution-net
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:5656/ping"]
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/ping"]
       interval: 30s
       timeout: 10s
       retries: 3
